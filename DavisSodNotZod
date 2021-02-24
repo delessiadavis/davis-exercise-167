@@ -1,0 +1,332 @@
+//AUTHOR: DELESSIA DAVIS
+//COURSE: CPT167
+/*PURPOSE: Julie's Metal Discount Program will allow users to calculate the cost of metal based on 
+ membership or age discount, and type of metal based on selection from a menu. 
+ It will also include a receipt in detail. */
+//STARTDATE: 02/18/2021
+package edu.course.davis.exercise6;
+//import scanner
+import java.util.Scanner;
+//start of Davis main class
+public class DavisMainClass 
+{
+	// Class Constants
+	public static final double TAX_RATE = .075;// fixed tax rate
+	public static final String DISCOUNT_NAME_MEMBER = "Member";//fixed name for member discount
+	public static final String DISCOUNT_NAME_SENIOR = "Senior";//fixed name for senior discount
+	public static final String DISCOUNT_NAME_NONE = "No Discount";//fixed name for no discount
+	public static final String DISCOUNT_NAME_QUIT = "Quit"; //fixed name to quit
+	public static final double DISCOUNT_RATE_MEMBER = 0.15;//fixed rate for member
+	public static final double DISCOUNT_RATE_SENIOR = 0.25;//fixed rate for senior
+	public static final double DISCOUNT_RATE_NONE = 0.0;// fixed rate for non member
+	public static final String ITEM_NAME_PREMIUM = "Gold"; // fixed name for premium item
+	public static final String ITEM_NAME_SPECIAL = "Silver"; // fixed name for special item
+	public static final String ITEM_NAME_BASIC = "Bronze"; // fixed name for basic item
+	public static final String ITEM_NAME_RETURN = "Return to Main Menu"; // fixed name for return to main menu
+	public static final double ITEM_PRICE_PREMIUM = 55.95; // fixed price for premium item
+	public static final double ITEM_PRICE_SPECIAL = 24.95; // fixed price for special item
+	public static final double ITEM_PRICE_BASIC = 15.95; // fixed price for basic item
+	public static final int RESET_VALUE = 0; // fixed reset value of zero
+		
+	//start of main method
+	public static void main(String[] args) 
+	{
+		//start of scanner
+		Scanner input = new Scanner (System.in); 
+		
+		//variables
+		String userName = ""; // name of users
+		char rateSelection = ' '; //discount rate
+		char itemSelection = ' '; // item selected
+		int howMany = 0; // quantity of metal
+		String discountName = ""; // name of discount
+		double discountRate = 0.0;// rate for discount
+		String itemName = ""; // name of the item selected
+		double itemPrice = 0.00; // price of item
+		double discountAmount = 0.00;// discount amount per metal
+		double discountPrice = 0.00;// discount price per metal
+		double subTotal = 0.00;// discount price times the quantity of metals
+		double tax =0.00;// tax for purchase
+		double totalCost = 0.00;// final cost
+		int memberCount = 0; // count of members
+		int seniorCount = 0; // count of seniors
+		int noDiscountCount =0; // count of non members
+		double grandTotal = 0.00; // grand total price
+		int premiumCount = 0; // count of premium metal
+		int specialCount = 0; // count of special metal
+		int basicCount =0; // count basic metal
+		double purchaseAmt = 0.00; // total for current purchase
+		// Welcome Banner
+		displayWelcomeBanner();
+		//input
+		userName = getUserName(input);
+		//prime read for main menu
+		rateSelection = validateMainMenu(input);
+		//test validation for menu selection if not quit
+		while (rateSelection != 'Q')
+		{
+			// read for item menu
+			itemSelection = validateItemMenu(input);
+			
+			//test to validate item selection not return
+			while (itemSelection !='R')
+			{
+				// read for how many
+				howMany = validateHowMany(input);
+				// process
+				//Proccess
+				//discount name and rate for member selection
+				if (rateSelection == 'A') 
+				{
+					discountName = DISCOUNT_NAME_MEMBER;// discount name for member
+					discountRate = DISCOUNT_RATE_MEMBER;// discount rate for member
+					memberCount++; //count for memebers
+				}// end of discount selection A
+				//discount name and rate for senior selection
+				else if (rateSelection == 'B') 
+				{
+					discountName = DISCOUNT_NAME_SENIOR;// discount name for senior
+					discountRate = DISCOUNT_RATE_SENIOR; // discount rate for selection B
+					seniorCount++; // count of senior members
+				}// end of discount selection B
+				// discount name and rate for none selection
+				else 
+				{
+					discountName = DISCOUNT_NAME_NONE;// discount name for non member
+					discountRate = DISCOUNT_RATE_NONE; // discount rate for selection C
+					noDiscountCount++;// count of non discount member
+				}// end of selection C
+				//get and validate item selection
+				// if item selection A		
+				if (itemSelection == 'A') 
+				{
+					itemName = ITEM_NAME_PREMIUM;	// item name for gold
+					itemPrice = ITEM_PRICE_PREMIUM; // item price for selection A
+					premiumCount++; // count for premium metal
+				}// end of selection A
+				// if item selection B
+				else if (itemSelection == 'B') 
+				{
+					itemName = ITEM_NAME_SPECIAL;	// item name for silver
+					itemPrice = ITEM_PRICE_SPECIAL; // item price for selection B
+					specialCount++; // count for special metal
+				}//end of selection B
+				// if item selection not A or B
+				else 
+				{
+					itemName = ITEM_NAME_BASIC;	// item name for bronze
+					itemPrice = ITEM_PRICE_BASIC; // item price for selection C
+					basicCount++; // count for basic metal
+				}//end of selection C
+				discountAmount = itemPrice * discountRate;// discount amount for item
+				discountPrice = itemPrice - discountAmount;// price for item at discount rate
+				purchaseAmt = howMany * discountPrice; // total for current purchase
+				subTotal = subTotal + purchaseAmt;// subtotal for item at discounted rate
+				
+				//output
+				//display item receipt
+				displayItemReceipt(itemName, itemPrice,discountName, discountRate, discountAmount, discountPrice, howMany, purchaseAmt, subTotal);
+				//modify LCV item selection
+				itemSelection = validateItemMenu(input);
+			}//end of item selection validation
+		//if item selection return
+		//process
+		tax = subTotal * TAX_RATE;// total taxes using tax rate constant
+		totalCost = subTotal + tax; // total cost subtotal and taxes
+		grandTotal = grandTotal + totalCost; // final total for all purchase
+		displayOrderTotal(userName, subTotal, tax, totalCost);
+		subTotal = RESET_VALUE; // reset value to zero for subtotal
+    
+		//modify LCV rate selction
+		rateSelection = validateMainMenu(input);
+    
+		}//end of rate selection validation		
+		// if grand total not zero
+		if (grandTotal > 0.0) 
+		{
+			displayFinalReport(memberCount, seniorCount, noDiscountCount, premiumCount, specialCount, basicCount, grandTotal);
+		} //end of grand total
+    
+		//Farewell
+		displayFarewellMessage();	
+    
+		//Close scanner
+		input.close();	
+	}// end of main method
+	//start of welcome banner method - displays welcome banner
+	public static void displayWelcomeBanner()
+	{
+		//welcome banner
+		System.out.println("Welcome to Julie's Metal Discount Program!");// Welcome banner
+		System.out.println("This program will allow you to select your desired metal and");//program description
+		System.out.println("compute your total with taxes and qualifying discount rates!");//program description cont.
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~\n");// border and new line
+	}//end of welcome method
+	// Farewell Message method - displays farewell message thanking user for using program
+	public static void displayFarewellMessage()
+	{
+		System.out.println("\nThank you for using Julie's Metal.");//thank you for your business
+		System.out.println("Enjoy the rest of your day!");//farewell
+	}//end of farewell method
+	//display item receipt method - displays item selected, discount rate, amount, and price, purchase amount, and subtotal
+	public static void displayItemReceipt(String borrowedItemName, double borrowedItemPrice, String borrowedDiscountName, 
+			double borrowedDiscountRate, double borrowedDiscountAmount, double borrowedDiscountPrice, 
+			int borrowedHowMany, double borrowedPurchaseAmt, double borrowedSubTotal)
+	{
+		//Item Report
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");//border on a new line
+		System.out.println("ITEM REPORT");// report title on new line
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");//border on a new line
+		System.out.printf("%-28s%-11s\n", "Item Name",borrowedItemName);//2 columns, item and the item name from input
+		System.out.printf("%-28s%-2s%8.2f\n","Original Price","$",borrowedItemPrice);//3 columns row name, dollar sign, and original price entered
+		System.out.printf("%-28s%-4s\n", "Discount Type",borrowedDiscountName);//2 columns, discount type and selected membership
+		System.out.printf("%-30s%-3s%-4.1f%2s\n", "Discount Rate","",(borrowedDiscountRate*100),"%");//4 columns, row name, blank, discount rate in percentage
+		System.out.printf("%-28s%-2s%8.2f\n","Discount Amount","$",borrowedDiscountAmount);//3 columns row name, dollar sign, discount amount
+		System.out.printf("%-28s%-2s%8.2f\n","Discounted Price","$",borrowedDiscountPrice);//3 columns row name, dollar sign, discount price
+		System.out.printf("%-30s%8d\n", "Quantity",borrowedHowMany);//2 columns, row name, and quantity
+		System.out.printf("%-28s%-2s%8.2f\n","Purchase Amount","$",borrowedPurchaseAmt);//3 columns row name, dollar sign, purchase amount
+		System.out.printf("%-28s%-2s%8.2f\n","Subtotal","$",borrowedSubTotal);//3 columns row name, dollar sign, subtotal
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");//closing border
+	}// end of item receipt method
+	//start of order report method - displays user name, subtotal, tax and total cost
+	public static void displayOrderTotal(String borrowedUserName, double borrowedSubTotal, double borrowedTax, double borrowedTotalCost)
+	{
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");//border on a new line
+		System.out.println("ORDER REPORT");// report title on new line
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");//border on a new line
+		System.out.printf("%-28s%-11s\n", "User ",borrowedUserName);//2 columns, item and the item name from input
+		System.out.printf("%-28s%-2s%8.2f\n","SubTotal","$",borrowedSubTotal);//3 columns row name, dollar sign, and original price entered
+		System.out.printf("%-28s%-2s%8.2f\n","Tax","$",borrowedTax);//3 columns row name, dollar sign, discount price
+		System.out.printf("%-28s%-2s%8.2f\n","Total Cost","$",borrowedTotalCost);//3 columns row name, dollar sign, discount price
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");//border on a new line
+	}//end of order report method
+	// display final report method - displays membership types and counts for each discount selected
+	public static void displayFinalReport(int borrowedMemberCount, int borrowedSeniorCount, int borrowedNoDiscountCount, 
+			int borrowedPremiumCount, int borrowedSpecialCount, int borrowedBasicCount,	double borrowedGrandTotal) 
+	{
+		//Final Report
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");//border on a new line
+		System.out.println("FINAL REPORT");// report title on new line
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");//border on a new line
+		System.out.printf("%-28s\n", "Count of Discount Types:"); // header for count of trips
+		System.out.printf("%-28s%10d\n", DISCOUNT_NAME_MEMBER,borrowedMemberCount);//2 columns, discount name, member count
+		System.out.printf("%-28s%10d\n", DISCOUNT_NAME_SENIOR,borrowedSeniorCount);//2 columns, discount name, senior count
+		System.out.printf("%-28s%10d\n", DISCOUNT_NAME_NONE,borrowedNoDiscountCount);//2 columns, discount name, non member count
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");//border on a new line
+		System.out.printf("%-28s\n", "Count of Item Types:"); // header for count of trips
+		System.out.printf("%-28s%10d\n", ITEM_NAME_PREMIUM,borrowedPremiumCount);//2 columns, item name, premium count
+		System.out.printf("%-28s%10d\n", ITEM_NAME_SPECIAL,borrowedSpecialCount);//2 columns, item name, special count
+		System.out.printf("%-28s%10d\n", ITEM_NAME_BASIC,borrowedBasicCount);//2 columns, item name, basic count
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");//border on a new line
+		System.out.printf("%-28s%-2s%8.2f\n","Grand Total","$",borrowedGrandTotal);//3 columns row name, dollar sign, total cost
+		System.out.println("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");//closing border
+	}//end final report method
+	//start of display menu method - displays discounts types for user to select
+	public static void displayMainMenu()
+	{
+		System.out.println("\n~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");//border on a new line
+		System.out.println("DISCOUNT MENU");//Menu Title
+		System.out.printf("%-8s%-12s%4.1f%1s", "[A] for", DISCOUNT_NAME_MEMBER,(DISCOUNT_RATE_MEMBER * 100),"%" );//option a for member
+		System.out.printf("\n%-8s%-12s%4.1f%1s", "[B] for", DISCOUNT_NAME_SENIOR,(DISCOUNT_RATE_SENIOR * 100),"%" );//option b for seniors
+		System.out.printf("\n%-8s%-12s%4.1f%1s", "[C] for", DISCOUNT_NAME_NONE,(DISCOUNT_RATE_NONE * 100),"%" ); // option c for non member/senior
+		System.out.printf("\n%-8s%-12s", "[Q] for", DISCOUNT_NAME_QUIT); // option to quit menu
+		System.out.println("\n~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~\n");// end menu border
+		System.out.print("Please enter your selection here: ");// request user input selection
+	}// end of main menu method
+	//start of item menu method - display metal types for user to select
+	public static void displayItemMenu()
+	{
+		System.out.println("\n~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~");//border on a new line
+		System.out.println("ITEM MENU");//Menu Title
+		System.out.printf("%-8s%-20s%1s%5.2f", "[A] for", ITEM_NAME_PREMIUM,"$", ITEM_PRICE_PREMIUM);//option a for premium
+		System.out.printf("\n%-8s%-20s%1s%5.2f", "[B] for", ITEM_NAME_SPECIAL,"$", ITEM_PRICE_SPECIAL);//option b for special
+		System.out.printf("\n%-8s%-20s%1s%5.2f", "[C] for", ITEM_NAME_BASIC,"$", ITEM_PRICE_BASIC); // option c for basic
+		System.out.printf("\n%-8s%-30s", "[R] to", ITEM_NAME_RETURN); // option r to return to main menu
+		System.out.println("\n~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~\n");// end menu border
+		System.out.print("Please enter your selection here: ");// request user input selection
+	}//end of item menu method 
+	// get user method - will get the users name
+	public static String getUserName (Scanner borrowedInput)
+	{
+		// local variable
+		String localSelection= "";//name of user
+		//request users name
+		System.out.println("Hello, may I have your name?");// greeting and asking user's name
+		localSelection = borrowedInput.nextLine();//user's name on a new line
+		System.out.println("Nice to meet you, " + localSelection +"!\n");//greeting with user's name
+		//return to main
+		return localSelection;
+	}// end of user method
+	//Rate Selection method - user will select type of discount based on member, senior or none
+	public static char validateMainMenu(Scanner borrowedInput)
+	{
+		//local variable
+		char localSelection = ' '; // selection from discount menu
+		//Rate selection Menu
+		//discount menu
+		displayMainMenu();
+		//user input
+		localSelection = borrowedInput.next().toUpperCase().charAt(0); // users selection
+		
+		//test for invalid selection
+		while (localSelection != 'A' && localSelection != 'B' && localSelection != 'C' && localSelection != 'Q')
+		{
+			//error message
+			System.out.print("\n~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~\n");//border on a new line
+			System.out.println("The selection made is invalid. Please try again. ");
+			System.out.print("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~\n");//border on a new line
+			//discount menu
+			displayMainMenu();
+			//Modify LCV
+			localSelection = borrowedInput.next().toUpperCase().charAt(0);
+		}// end of discount validation
+		//return discount to main
+		return localSelection;
+	}//end of rate selection 
+	//Start of Item Method - user will select item type based on premium, special, or basic
+	public static char validateItemMenu(Scanner borrowedInput)
+	{
+		// local variable
+		char localSelection = ' '; // selection for item menu	
+		// item menu
+		displayItemMenu();
+		//user input
+		localSelection = borrowedInput.next().toUpperCase().charAt(0); // user selection from menu
+		// test for invalid item name
+		while (localSelection !='A' && localSelection !='B' && localSelection !='C' && localSelection !='R')
+		{
+			//error message
+			System.out.print("\n~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~\n");//border on a new line
+			System.out.println("The selection made is invalid. Please try again. ");
+			System.out.print("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~\n");//border on a new line
+			//item menu
+			displayItemMenu();
+			//Modify LCV
+			localSelection = borrowedInput.next().toUpperCase().charAt(0); // user selection from menu
+		}//end of item validation 
+		//return item to main
+		return localSelection;
+	}//end of item method
+	//Start Quantity Method
+	public static int validateHowMany(Scanner borrowedInput)
+	{
+		// local variable
+		int localhowMany = 0;// number metals for purchase
+		//request user enter quantity
+		System.out.println("How many would you like? ");// asking the quantity of item
+		localhowMany = borrowedInput.nextInt();//quantity of item new line
+		// test quantity is greater than 0
+		while (localhowMany <=0)
+		{
+			System.out.print("\n~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~\n");//border on a new line
+			System.out.println("The value entered is invalid. Please try again.");
+			System.out.print("~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~\n");//border on a new line
+			System.out.print("How many would you like? ");// asking the quantity of item
+			
+			// Modify LCV
+			localhowMany = borrowedInput.nextInt();//quantity of item new line
+		}//end of quantity validation
+		//return to how many 
+		return localhowMany;
+	}//end of quantity method
+}// end of main class
